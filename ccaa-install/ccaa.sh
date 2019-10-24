@@ -145,6 +145,7 @@ function setting(){
 
 	#保留一份安装脚本
 	cp ./ccaa.sh.bak ../ccaa-install.sh
+	cp ./upbt.sh ../upbt.sh
 
 	#获取ip
 	osip=$(curl -4s https://api.ip.sb/ip)
