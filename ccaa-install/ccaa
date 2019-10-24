@@ -1,0 +1,79 @@
+#!/bin/bash
+#####		CCAA管理脚本			#####
+#####		Author:xiaoz.me			#####
+#####		Update:2017-12-08		#####
+
+#导入环境变量
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/sbin
+export PATH
+
+aria2pid=$(pgrep 'aria2c')
+caddypid=$(pgrep 'caddy')
+
+case $1 in
+	'start')
+		file="./.firstrun"
+		if [ ! -f "$file" ];
+		then
+			echo "检测到容器第一次运行, 初始化RPC秘钥..."
+			new_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 32)
+			echo "初始化登录密码..."
+			read -p "请输入AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示)：" new_password
+			isRandom="no"
+			if [ -z ${new_password} ] 
+			then
+				#echo "[->随机密码]"
+				new_password=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 16)
+				isRandom="yes"
+			fi
+			sed -i "s/rpc-secret=/rpc-secret=${new_secret}/g" /etc/ccaa/aria2.conf
+			sed -i "s/password/${new_password}/g" /etc/ccaa/caddy.conf
+			osip=$(curl -4s https://api.ip.sb/ip)
+			echo '-------------------------------------------------------------'
+			echo "大功告成！你的Aria2已经准备就绪！"
+			echo "访问：http://${osip}:6080/#!/settings/ariang 来进行最后一步操作 -> 设置RPC秘钥"
+			echo '登录用户名: admin'
+			if [ ${isRandom} == "yes" ] 
+			then
+				echo "登录密码：" ${new_password}
+			else
+				echo "登录密码：(用户已设置)"
+			fi
+			echo 'Aria2 RPC 密钥: ' ${new_secret}
+			echo '如果无法访问, 请检查容器是否映射了6080端口和6800端口！'
+			echo '帮助文档: https://dwz.ovh/ccaa （必看）' 
+			echo '-------------------------------------------------------------'
+			#创建标记
+			echo "firstrun=false" > $file
+		fi
+		nohup aria2c --conf-path=/etc/ccaa/aria2.conf > /etc/ccaa/aria2.log 2>&1 &
+		nohup caddy -conf="/etc/ccaa/caddy.conf" > /etc/ccaa/caddy.log 2>&1 &
+		exit
+	;;
+	'stop')
+		kill -9 ${aria2pid}
+		kill -9 ${caddypid}
+	;;
+	'restart')
+		kill -9 ${aria2pid}
+		kill -9 ${caddypid}
+		nohup aria2c --conf-path=/etc/ccaa/aria2.conf > /etc/ccaa/aria2.log 2>&1 &
+		nohup caddy -conf="/etc/ccaa/caddy.conf" > /etc/ccaa/caddy.log 2>&1 &
+		exit;
+	;;
+	'status')
+		if [ "$aria2pid" == "" ]
+			then
+				echo "Not running!"
+			else
+				echo '-----------------------------------------------'
+				echo "Aria2 is running,pid is ${aria2pid}."
+				echo "Caddy is running,pid is ${caddypid}."
+				echo '-----------------------------------------------'
+		fi
+	;;
+	*)
+		echo '参数错误！'
+		exit
+	;;
+esac
