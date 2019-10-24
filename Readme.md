@@ -3,7 +3,7 @@
 ## 安装方法 ##
 使用命令(标记的内容为需要自行设置的内容, 在有多个容器部署的情况下需要按情况设置)：
 ```bash
-docker run -it -p ${RPC端口}:6800 -p ${Web面板端口}:6080 -v ${外部下载路径}:/data/Download lamgc/ccaa-docker
+docker run -it -p ${RPC端口}:6800 -p ${Web面板端口}:6080 -v ${外部下载路径}:/data/Download lamgc/aria2ng
 ```
 创建新的容器, 第一次运行容器时会要求设置新密码：
 ```
