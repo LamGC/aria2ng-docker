@@ -1,5 +1,8 @@
 # CCAA Docker快速部署镜像 #
 
+## 原贴链接 ##
+链接：[小z博客 - CentOS 7一键安装Caddy + Aria2 + AriaNg实现离线下载](https://www.xiaoz.me/archives/11250)
+
 ## 安装方法 ##
 使用命令(标记的内容为需要自行设置的内容, 在有多个容器部署的情况下需要按情况设置)：
 ```bash
@@ -31,9 +34,6 @@ Aria2 RPC 密钥:  cd4a77558e660f752352c738xxxxxxxx
 初始完毕后, 打开浏览器, 输入提示中的地址, 使用用户名和密码登录Web面板, 转到AriaNG设置
 ![AriaNG设置界面](14d6c337.bmp)
 将初始化后的RPC秘钥填入后刷新网页，左侧`Aria2 状态`显示`已连接`后即安装成功。
-## 原贴链接 ##
-链接：[小z博客 - CentOS 7一键安装Caddy + Aria2 + AriaNg实现离线下载](https://www.xiaoz.me/archives/11250)
-
 
 ## 需要外部设置的 ##
 下载路径：`/data/Download`, 需要映射到外部,除非不需要在外面存储
