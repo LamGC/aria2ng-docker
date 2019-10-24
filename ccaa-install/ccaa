@@ -18,7 +18,9 @@ case $1 in
 			echo "检测到容器第一次运行, 初始化RPC秘钥..."
 			new_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 32)
 			echo "初始化登录密码..."
-			read -p "请输入AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示)：" new_password
+			echo "请输入AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示)："
+			read -s new_password
+			echo ""
 			isRandom="no"
 			if [ -z ${new_password} ] 
 			then
