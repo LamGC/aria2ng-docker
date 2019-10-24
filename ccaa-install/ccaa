@@ -15,31 +15,50 @@ case $1 in
 		file="./.firstrun"
 		if [ ! -f "$file" ];
 		then
-			echo "检测到容器第一次运行, 初始化RPC秘钥..."
-			new_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 32)
+			echo "检测到容器第一次运行, 进行密码设置..."
 			echo "初始化登录密码..."
-			echo "请输入AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示)："
+			echo -n "请设置AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示): "
 			read -s new_password
+			echo -n "请设置Aria2 RPC密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示): "
+			read -s rpc_secret
 			echo ""
-			isRandom="no"
+
+			#检查密码非空
+			psw_isRandom="no"
 			if [ -z ${new_password} ] 
 			then
 				#echo "[->随机密码]"
 				new_password=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 16)
-				isRandom="yes"
+				psw_isRandom="yes"
 			fi
-			sed -i "s/rpc-secret=/rpc-secret=${new_secret}/g" /etc/ccaa/aria2.conf
+
+			#检查秘钥非空
+			secret_isRandom="no"
+			if [ -z ${rpc_secret} ]
+			then
+				rpc_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 16)
+				secret_isRandom="yes"
+			fi
+
+			sed -i "s/rpc-secret=/rpc-secret=${rpc_secret}/g" /etc/ccaa/aria2.conf
 			sed -i "s/password/${new_password}/g" /etc/ccaa/caddy.conf
 			osip=$(curl -4s https://api.ip.sb/ip)
 			echo '-------------------------------------------------------------'
 			echo "大功告成！你的Aria2已经准备就绪！"
 			echo "访问：http://${osip}:6080/#!/settings/ariang 来进行最后一步操作 -> 设置RPC秘钥"
 			echo '登录用户名: admin'
-			if [ ${isRandom} == "yes" ] 
+			if [ ${psw_isRandom} == "yes" ] 
 			then
-				echo "登录密码：" ${new_password}
+				echo "登录密码: " ${new_password}
 			else
-				echo "登录密码：(用户已设置)"
+				echo "登录密码: (用户已设置)"
+			fi
+			
+			if [ ${secret_isRandom} == "yes" ] 
+			then
+				echo "Aria2 RPC 密钥: " ${rpc_secret}
+			else
+				echo "Aria2 RPC 密钥: (用户已设置)"
 			fi
 			echo 'Aria2 RPC 密钥: ' ${new_secret}
 			echo '如果无法访问, 请检查容器是否映射了6080端口和6800端口！'
@@ -48,6 +67,7 @@ case $1 in
 			#创建标记
 			echo "firstrun=false" > $file
 		fi
+
 		nohup aria2c --conf-path=/etc/ccaa/aria2.conf > /etc/ccaa/aria2.log 2>&1 &
 		nohup caddy -conf="/etc/ccaa/caddy.conf" > /etc/ccaa/caddy.log 2>&1 &
 		exit
