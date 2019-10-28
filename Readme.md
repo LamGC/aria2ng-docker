@@ -6,7 +6,7 @@
 ## 安装方法 ##
 使用命令(标记的内容为需要自行设置的内容, 在有多个容器部署的情况下需要按情况设置)：
 ```bash
-docker run -it -p ${RPC端口}:6800 -p ${Web面板端口}:6080 -v ${外部下载路径}:/data/Download lamgc/aria2ng
+docker run -it -p ${RPC端口}:6800 -p ${Web面板端口}:6080 -v ${外部下载路径}:/data/ccaaDownload lamgc/aria2ng
 ```
 创建新的容器, 第一次运行容器时会要求设置新的Web面板密码和RPC秘钥密码：
 ```
@@ -37,7 +37,7 @@ Aria2 RPC 密钥:  cd4a77558e660f752352c738xxxxxxxx
 将初始化后的RPC秘钥填入后刷新网页，左侧`Aria2 状态`显示`已连接`后即安装成功。
 
 ## 需要外部设置的 ##
-下载路径：`/data/Download`, 需要映射到外部,除非不需要在外面存储<br/>
+下载路径：`/data/ccaaDownload`, 需要映射到外部,除非不需要在外面存储<br/>
 需要开放的端口：`6080`(web面板), `6800`(RPC端口)
 
 ## 目前已知的问题 ##
