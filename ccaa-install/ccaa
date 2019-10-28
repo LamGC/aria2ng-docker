@@ -17,8 +17,9 @@ case $1 in
 		then
 			echo "检测到容器第一次运行, 进行密码设置..."
 			echo "初始化登录密码..."
-			echo -n "请设置AriaNG登录密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示): "
+			echo -n "请设置AriaNG登录密码(不填写则为随机密码, 设置完毕后显示): "
 			read -s new_password
+			echo ""
 			echo -n "请设置Aria2 RPC密码(仅限大小写字母和数字, 不填写则为随机密码, 设置完毕后显示): "
 			read -s rpc_secret
 			echo ""
@@ -36,7 +37,7 @@ case $1 in
 			secret_isRandom="no"
 			if [ -z ${rpc_secret} ]
 			then
-				rpc_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 16)
+				rpc_secret=$( echo $(($RANDOM*$RANDOM+$RANDOM)) | md5sum | head -c 24)
 				secret_isRandom="yes"
 			fi
 
@@ -53,14 +54,13 @@ case $1 in
 			else
 				echo "登录密码: (用户已设置)"
 			fi
-			
+
 			if [ ${secret_isRandom} == "yes" ] 
 			then
 				echo "Aria2 RPC 密钥: " ${rpc_secret}
 			else
 				echo "Aria2 RPC 密钥: (用户已设置)"
 			fi
-			echo 'Aria2 RPC 密钥: ' ${new_secret}
 			echo '如果无法访问, 请检查容器是否映射了6080端口和6800端口！'
 			echo '帮助文档: https://dwz.ovh/ccaa （必看）' 
 			echo '-------------------------------------------------------------'
